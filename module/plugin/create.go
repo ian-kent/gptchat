@@ -168,4 +168,4 @@ To create a plugin, you should use the "/plugin create <plugin-id> {}" command, 
 }
 ` + util.TripleQuote + `
 
-Your code must be valid Go code which can compile without any errors.`
+Your code inside the '/plugin create' body must be valid Go code which can compile without any errors. Do not include quotes or attempt to use a JSON body.`
