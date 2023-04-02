@@ -1,9 +1,15 @@
 GPTChat
 =======
 
-GPTChat is a client for GPT-4 using the OpenAI API.
+GPTChat is a client which gives GPT-4 some unique tools to be a better AI.
 
-It gives GPT-4 some unique tools to be a better AI.
+With GPTChat, GPT-4 can:
+* remember useful information and recall it later
+* recall information without knowing it's previously remembered it
+* write it's own plugins and call them
+* decide to write plugins without being prompted
+* complete tasks by combining memories and plugins
+* use multi-step commands to complete complex tasks
 
 ## Memory
 
