@@ -11,6 +11,26 @@ With GPTChat, GPT-4 can:
 * complete tasks by combining memories and plugins
 * use multi-step commands to complete complex tasks
 
+### Getting started
+
+You'll need:
+
+* A working installation of Go (which you download from https://go.dev/)
+* An OpenAI account
+* An API key with access to the GPT-4 API
+
+If you don't have an API key, you can get one here:
+https://platform.openai.com/account/api-keys
+
+If you haven't joined the GPT-4 API waitlist, you can do that here:
+https://openai.com/waitlist/gpt-4-api
+
+Once you're ready:
+
+1. Set the `OPENAI_API_KEY` environment variable to avoid the API key prompt on startup
+2. Run GPTChat with `go run .` from the `gptchat` directory
+3. Have fun!
+
 ## Memory
 
 GPT-4's context window is pretty small.
