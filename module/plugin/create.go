@@ -78,6 +78,9 @@ func createPlugin(id, body string) (string, error) {
 				return "", fmt.Errorf("error creating directory: %s", err)
 			}
 		}
+		else {
+			return "", fmt.Errorf("error creating directory: %s", err)
+		}
 	}
 
 	sourcePath := "./module/plugin/source/" + id + "/plugin.go"
