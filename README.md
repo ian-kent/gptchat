@@ -51,6 +51,8 @@ With the plugin system, you can ask GPT-4 to generate two random numbers and add
 
 [See a GPT-4 plugin demo on YouTube](https://www.youtube.com/watch?v=o7M-XH6tMhc)
 
+ℹ️ Plugins are only supported on unix based systems like Linux and MacOS - to get plugins working on Windows, you'll need to use something like WSL2.
+
 ## Contributing
 
 PRs to add new features are welcome.
