@@ -3,7 +3,10 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
+	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/module"
+	"github.com/ian-kent/gptchat/ui"
 	"github.com/ian-kent/gptchat/util"
 	openai "github.com/sashabaranov/go-openai"
 	"io/ioutil"
@@ -13,12 +16,18 @@ import (
 )
 
 type Module struct {
+	cfg    config.Config
 	client *openai.Client
 }
 
-func (m *Module) Load(client *openai.Client) error {
+func (m *Module) Load(cfg config.Config, client *openai.Client) error {
+	m.cfg = cfg
 	m.client = client
 	return nil
+}
+
+func (m *Module) UpdateConfig(cfg config.Config) {
+	m.cfg = cfg
 }
 
 func (m *Module) Prompt() string {
@@ -38,13 +47,13 @@ func (m *Module) Execute(args, body string) (string, error) {
 
 	switch cmd {
 	case "create":
-		return createPlugin(args, body)
+		return m.createPlugin(args, body)
 	default:
 		return "", errors.New(fmt.Sprintf("%s not implemented", args))
 	}
 }
 
-func createPlugin(id, body string) (string, error) {
+func (m *Module) createPlugin(id, body string) (string, error) {
 	body = strings.TrimSpace(body)
 	if len(body) == 0 {
 		return "", errors.New("plugin source not found")
@@ -74,6 +83,31 @@ func createPlugin(id, body string) (string, error) {
 	err = ioutil.WriteFile("./module/plugin/source/"+id+"/plugin.go", []byte(source), 0644)
 	if err != nil {
 		return "", fmt.Errorf("error writing source file: %s", err)
+	}
+
+	if m.cfg.IsSupervisedMode() {
+		fmt.Println("============================================================")
+		fmt.Println()
+		ui.Warn("⚠️ GPT written plugins are untrusted code from the internet")
+		fmt.Println()
+		fmt.Println("You should review this code before allowing it to be compiled and executed.")
+		fmt.Println()
+		fmt.Println("If you allow this action, GPT is able to execute code with the same permissions as your user.")
+		fmt.Println()
+		color.New(color.FgHiWhite, color.Bold).Println("This is potentially dangerous.")
+		fmt.Println()
+		fmt.Println("The source code GPT has written can be found here:")
+		fmt.Println(sourcePath)
+		fmt.Println()
+		confirmation := ui.PromptInput("Enter 'confirm' to confirm, anything else will block:")
+		if confirmation != "confirm" {
+			fmt.Println()
+			fmt.Println("============================================================")
+			return "The user has prevented you from running this code", errors.New(confirmation)
+		}
+		fmt.Println()
+		fmt.Println("============================================================")
+		fmt.Println()
 	}
 
 	pluginPath := "./module/plugin/compiled/" + id + ".so"

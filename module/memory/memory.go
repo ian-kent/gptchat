@@ -3,6 +3,7 @@ package memory
 import (
 	"errors"
 	"fmt"
+	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/util"
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -13,6 +14,7 @@ type memory struct {
 }
 
 type Module struct {
+	cfg      config.Config
 	client   *openai.Client
 	memories []memory
 }
@@ -21,9 +23,14 @@ func (m *Module) ID() string {
 	return "memory"
 }
 
-func (m *Module) Load(client *openai.Client) error {
+func (m *Module) Load(cfg config.Config, client *openai.Client) error {
+	m.cfg = cfg
 	m.client = client
 	return m.loadFromFile()
+}
+
+func (m *Module) UpdateConfig(cfg config.Config) {
+	m.cfg = cfg
 }
 
 func (m *Module) Execute(args, body string) (string, error) {

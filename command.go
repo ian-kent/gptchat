@@ -20,6 +20,9 @@ type slashCommandResult struct {
 
 	// toggleDebugMode will switch between debug on and debug off
 	toggleDebugMode bool
+
+	// toggleSupervisedMode will switch between supervised mode on and off
+	toggleSupervisedMode bool
 }
 
 type slashCommand struct {
@@ -56,6 +59,14 @@ var slashCommands = []slashCommand{
 		fn: func(s string) (bool, *slashCommandResult) {
 			return true, &slashCommandResult{
 				toggleDebugMode: true,
+			}
+		},
+	},
+	{
+		command: "supervisor",
+		fn: func(s string) (bool, *slashCommandResult) {
+			return true, &slashCommandResult{
+				toggleSupervisedMode: true,
 			}
 		},
 	},

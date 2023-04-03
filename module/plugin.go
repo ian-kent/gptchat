@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ian-kent/gptchat/config"
 	"github.com/sashabaranov/go-openai"
 	"os"
 	"plugin"
@@ -20,9 +21,10 @@ type pluginLoader struct {
 	plugin Plugin
 }
 
-func (p pluginLoader) Load(*openai.Client) error {
+func (p pluginLoader) Load(config.Config, *openai.Client) error {
 	return nil
 }
+func (p pluginLoader) UpdateConfig(config.Config) {}
 func (p pluginLoader) ID() string {
 	return p.plugin.ID()
 }

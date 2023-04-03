@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/module"
 	"github.com/ian-kent/gptchat/module/memory"
 	"github.com/ian-kent/gptchat/module/plugin"
@@ -13,6 +14,7 @@ import (
 )
 
 var client *openai.Client
+var cfg = config.New()
 
 func init() {
 	openaiAPIKey := strings.TrimSpace(os.Getenv("OPENAI_API_KEY"))
@@ -35,9 +37,29 @@ func init() {
 		}
 	}
 
+	cfg = cfg.WithOpenAIAPIKey(openaiAPIKey)
+
+	supervisorMode := os.Getenv("GPTCHAT_SUPERVISOR")
+	switch strings.ToLower(supervisorMode) {
+	case "disabled":
+		ui.Warn("Supervisor mode is disabled")
+		cfg = cfg.WithSupervisedMode(false)
+	default:
+	}
+
+	debugEnv := os.Getenv("GPTCHAT_DEBUG")
+	if debugEnv != "" {
+		v, err := strconv.ParseBool(debugEnv)
+		if err != nil {
+			ui.Warn(fmt.Sprintf("error parsing GPT_DEBUG: %s", err.Error()))
+		} else {
+			cfg = cfg.WithDebugMode(v)
+		}
+	}
+
 	client = openai.NewClient(openaiAPIKey)
 
-	module.Load(client, []module.Module{
+	module.Load(cfg, client, []module.Module{
 		&memory.Module{},
 		&plugin.Module{},
 	}...)
@@ -48,22 +70,11 @@ func init() {
 }
 
 func main() {
-	debugMode := false
-	debugEnv := os.Getenv("GPT_DEBUG")
-	if debugEnv != "" {
-		v, err := strconv.ParseBool(debugEnv)
-		if err != nil {
-			ui.Warn(fmt.Sprintf("error parsing GPT_DEBUG: %s", err.Error()))
-		} else {
-			debugMode = v
-		}
-	}
-
 	ui.Welcome(
 		`Welcome to the GPT-4 client.`,
 		`You can talk directly to GPT-4, or you can use /commands to interact with the client.
 
 Use /help to see a list of available commands.`)
 
-	chatLoop(debugMode)
+	chatLoop(cfg)
 }

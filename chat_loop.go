@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/module"
 	"github.com/ian-kent/gptchat/parser"
 	"github.com/ian-kent/gptchat/ui"
@@ -12,20 +13,20 @@ import (
 	"time"
 )
 
-func chatLoop(debugMode bool) {
+func chatLoop(cfg config.Config) {
 RESET:
 	appendMessage(openai.ChatMessageRoleSystem, systemPrompt)
-	if debugMode {
+	if cfg.IsDebugMode() {
 		ui.PrintChatDebug(ui.System, systemPrompt)
 	}
 
 	var skipUserInput = true
 	appendMessage(openai.ChatMessageRoleUser, openingPrompt)
-	if debugMode {
+	if cfg.IsDebugMode() {
 		ui.PrintChatDebug(ui.User, openingPrompt)
 	}
 
-	if !debugMode {
+	if !cfg.IsDebugMode() {
 		ui.PrintChat(ui.App, "Setting up the chat environment, please wait for GPT to respond - this may take a few moments.")
 	}
 
@@ -58,11 +59,21 @@ RESET:
 				}
 
 				if result.toggleDebugMode {
-					debugMode = !debugMode
-					if debugMode {
+					cfg = cfg.WithDebugMode(!cfg.IsDebugMode())
+					if cfg.IsDebugMode() {
 						ui.PrintChat(ui.App, "Debug mode is now enabled")
 					} else {
 						ui.PrintChat(ui.App, "Debug mode is now disabled")
+					}
+					continue
+				}
+
+				if result.toggleSupervisedMode {
+					cfg = cfg.WithSupervisedMode(!cfg.IsSupervisedMode())
+					if cfg.IsSupervisedMode() {
+						ui.PrintChat(ui.App, "Supervised mode is now enabled")
+					} else {
+						ui.PrintChat(ui.App, "Supervised mode is now disabled")
 					}
 					continue
 				}
@@ -90,7 +101,7 @@ RESET:
 		if i%5 == 0 {
 			interval := intervalPrompt()
 			appendMessage(openai.ChatMessageRoleSystem, interval)
-			if debugMode {
+			if cfg.IsDebugMode() {
 				ui.PrintChatDebug(ui.System, interval)
 			}
 		}
@@ -122,13 +133,13 @@ RESET:
 
 		response := resp.Choices[0].Message.Content
 		appendMessage(openai.ChatMessageRoleAssistant, response)
-		if debugMode {
+		if cfg.IsDebugMode() {
 			ui.PrintChat(ui.AI, response)
 		}
 
 		parseResult := parser.Parse(response)
 
-		if !debugMode && parseResult.Chat != "" {
+		if !cfg.IsDebugMode() && parseResult.Chat != "" {
 			ui.PrintChat(ui.AI, parseResult.Chat)
 		}
 
@@ -162,7 +173,7 @@ The command provided this additional output:
 					}
 
 					appendMessage(openai.ChatMessageRoleSystem, msg)
-					if debugMode {
+					if cfg.IsDebugMode() {
 						ui.PrintChatDebug(ui.Module, msg)
 					}
 					continue
@@ -180,7 +191,7 @@ The output was:
 %s`, command.String(), result.Prompt)
 				appendMessage(openai.ChatMessageRoleSystem, commandResult)
 
-				if debugMode {
+				if cfg.IsDebugMode() {
 					ui.PrintChatDebug(ui.Module, commandResult)
 				}
 				continue
