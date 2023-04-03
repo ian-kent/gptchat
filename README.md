@@ -61,7 +61,19 @@ Be careful of prompt changes - small changes can disrupt GPT-4's ability to use 
 
 You should supervise GPT-4's activity.
 
-In one experiment, GPT-4 gave itself internet access with a HTTP client plugin - this seemed like a bad idea. 
+In one experiment, GPT-4 gave itself internet access with a HTTP client plugin - this seemed like a bad idea.
+
+### Supervised mode
+
+GPTChat will run in supervised mode by default.
+
+This doesn't restrict any functionality, but does require user confirmation before compiling and executing any plugin code written by GPT, giving users a chance to review the code for safety before executing it.
+
+⚠️ Code written by GPT is untrusted code from the internet and potentially dangerous
+
+All code is compiled and executed as your user, with the same level of permissions your user has.  It may be safer to run this in a container or virtual machine.
+
+Supervised mode can be disabled but I wouldn't recommend it.
 
 # License
 
