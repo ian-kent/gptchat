@@ -96,6 +96,14 @@ func PromptConfirm(prompt string) bool {
 	return strings.ToUpper(text) == "Y"
 }
 
+func PromptInput(prompt string) string {
+	reader := bufio.NewReader(os.Stdin)
+	cAppBold.Printf("%s ", prompt)
+	text, _ := reader.ReadString('\n')
+	text = strings.TrimSpace(text)
+	return text
+}
+
 func indent(input string) string {
 	lines := strings.Split(string(input), "\n")
 	var output string
