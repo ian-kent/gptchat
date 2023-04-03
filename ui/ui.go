@@ -14,8 +14,10 @@ var (
 	cUseful   = color.New(color.FgWhite)
 	cAI       = color.New(color.FgGreen)
 	cUser     = color.New(color.FgYellow)
-	cError    = color.New(color.FgHiRed, color.Bold)
-	cWarn     = color.New(color.FgHiYellow, color.Bold)
+
+	cInfo  = color.New(color.FgWhite, color.Bold)
+	cError = color.New(color.FgHiRed, color.Bold)
+	cWarn  = color.New(color.FgHiYellow, color.Bold)
 
 	cApp     = color.New(color.FgWhite)
 	cAppBold = color.New(color.FgGreen, color.Bold)
@@ -38,6 +40,11 @@ func Error(message string, err error) {
 
 func Warn(message string) {
 	cWarn.Printf("WARNING: ")
+	cUseful.Printf("%s\n", message)
+}
+
+func Info(message string) {
+	cWarn.Printf("INFO: ")
 	cUseful.Printf("%s\n", message)
 }
 

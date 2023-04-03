@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ian-kent/gptchat/config"
+	"github.com/ian-kent/gptchat/ui"
 	openai "github.com/sashabaranov/go-openai"
 	"strings"
 )
@@ -26,7 +27,11 @@ var loadedModules = make(map[string]Module)
 func Load(cfg config.Config, client *openai.Client, modules ...Module) error {
 	for _, module := range modules {
 		if err := module.Load(cfg, client); err != nil {
-			return err
+			ui.Warn(fmt.Sprintf("failed to load module %s: %s", module.ID(), err))
+			continue
+		}
+		if cfg.IsDebugMode() {
+			ui.Info(fmt.Sprintf("loaded module %s", module.ID()))
 		}
 		loadedModules[module.ID()] = module
 	}

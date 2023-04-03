@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ian-kent/gptchat/config"
+	"github.com/ian-kent/gptchat/ui"
 	"github.com/sashabaranov/go-openai"
 	"os"
 	"plugin"
@@ -71,17 +72,20 @@ func LoadCompiledPlugins() error {
 
 		loadedPlugin, err := OpenPlugin(pluginPath + entry.Name())
 		if err != nil {
-			return fmt.Errorf("error opening plugin: %s", err)
+			ui.Warn(fmt.Sprintf("error opening plugin: %s", err))
+			continue
 		}
 
 		pluginID := loadedPlugin.ID()
 		if IsLoaded(pluginID) {
-			return fmt.Errorf("plugin with this ID is already loaded")
+			ui.Warn(fmt.Sprintf("plugin with this ID is already loaded: %s", err))
+			continue
 		}
 
 		err = LoadPlugin(GetModuleForPlugin(loadedPlugin))
 		if err != nil {
-			return fmt.Errorf("error loading plugin: %s", err)
+			ui.Warn(fmt.Sprintf("error loading plugin: %s", err))
+			continue
 		}
 	}
 

@@ -15,6 +15,35 @@ import (
 	"strings"
 )
 
+var (
+	// TODO make this configurable
+	PluginSourcePath  = "./module/plugin/source"
+	PluginCompilePath = "./module/plugin/compiled"
+)
+
+var ErrPluginSourcePathMissing = errors.New("plugin source path is missing")
+var ErrPluginCompilePathMissing = errors.New("plugin compiled path is missing")
+
+func CheckPaths() error {
+	_, err := os.Stat(PluginSourcePath)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err != nil {
+		return ErrPluginSourcePathMissing
+	}
+
+	_, err = os.Stat(PluginCompilePath)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err != nil {
+		return ErrPluginCompilePathMissing
+	}
+
+	return nil
+}
+
 type Module struct {
 	cfg    config.Config
 	client *openai.Client
@@ -23,6 +52,11 @@ type Module struct {
 func (m *Module) Load(cfg config.Config, client *openai.Client) error {
 	m.cfg = cfg
 	m.client = client
+
+	if err := CheckPaths(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -74,13 +108,26 @@ func (m *Module) createPlugin(id, body string) (string, error) {
 
 	source := strings.TrimPrefix(strings.TrimSuffix(body, "}"), "{")
 
-	err := os.Mkdir("./module/plugin/source/"+id, 0777)
-	if err != nil {
-		return "", fmt.Errorf("error creating directory: %s", err)
+	pluginSourceDir := PluginSourcePath + "/" + id
+	_, err := os.Stat(pluginSourceDir)
+	if err != nil && !os.IsNotExist(err) {
+		return "", fmt.Errorf("error checking if directory exists: %s", err)
+	}
+	// only create the directory if it doesn't exist; it's possible GPT had a compile
+	// error in the last attempt in which case we can overwrite it
+	//
+	// we don't get this if the last attempt was successful since it'll show up
+	// as a loaded plugin in the check above
+	if os.IsNotExist(err) {
+		// if err is nil then the directory doesn't exist, let's create it
+		err := os.Mkdir(pluginSourceDir, 0777)
+		if err != nil {
+			return "", fmt.Errorf("error creating directory: %s", err)
+		}
 	}
 
-	sourcePath := "./module/plugin/source/" + id + "/plugin.go"
-	err = ioutil.WriteFile("./module/plugin/source/"+id+"/plugin.go", []byte(source), 0644)
+	sourcePath := pluginSourceDir + "/plugin.go"
+	err = ioutil.WriteFile(sourcePath, []byte(source), 0644)
 	if err != nil {
 		return "", fmt.Errorf("error writing source file: %s", err)
 	}
@@ -110,7 +157,7 @@ func (m *Module) createPlugin(id, body string) (string, error) {
 		fmt.Println()
 	}
 
-	pluginPath := "./module/plugin/compiled/" + id + ".so"
+	pluginPath := PluginCompilePath + "/" + id + ".so"
 	cmd := exec.Command("go", "build", "-buildmode=plugin", "-o", pluginPath, sourcePath)
 	if b, err := cmd.CombinedOutput(); err != nil {
 		return string(b), fmt.Errorf("error compiling plugin: %s", err)

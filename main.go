@@ -63,9 +63,9 @@ func init() {
 		&memory.Module{},
 		&plugin.Module{},
 	}...)
+
 	if err := module.LoadCompiledPlugins(); err != nil {
-		fmt.Printf("error loading compiled plugins: %s", err)
-		os.Exit(1)
+		ui.Warn(fmt.Sprintf("error loading compiled plugins: %s", err))
 	}
 }
 

@@ -60,6 +60,7 @@ RESET:
 
 				if result.toggleDebugMode {
 					cfg = cfg.WithDebugMode(!cfg.IsDebugMode())
+					module.UpdateConfig(cfg)
 					if cfg.IsDebugMode() {
 						ui.PrintChat(ui.App, "Debug mode is now enabled")
 					} else {
@@ -70,6 +71,7 @@ RESET:
 
 				if result.toggleSupervisedMode {
 					cfg = cfg.WithSupervisedMode(!cfg.IsSupervisedMode())
+					module.UpdateConfig(cfg)
 					if cfg.IsSupervisedMode() {
 						ui.PrintChat(ui.App, "Supervised mode is now enabled")
 					} else {
