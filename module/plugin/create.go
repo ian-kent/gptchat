@@ -10,6 +10,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
+	"math/rand"
 )
 
 type Module struct {
@@ -67,7 +69,15 @@ func createPlugin(id, body string) (string, error) {
 
 	err := os.Mkdir("./module/plugin/source/"+id, 0777)
 	if err != nil {
-		return "", fmt.Errorf("error creating directory: %s", err)
+		rand.Seed(time.Now().UnixNano())
+		if os.IsExist(err) {
+			new_path := fmt.Sprintf("./module/plugin/source/%s_%d", id, rand.Uint64())
+			os.Rename("./module/plugin/source/"+id, new_path)
+			err := os.Mkdir("./module/plugin/source/"+id, 0777)
+			if err != nil {
+				return "", fmt.Errorf("error creating directory: %s", err)
+			}
+		}
 	}
 
 	sourcePath := "./module/plugin/source/" + id + "/plugin.go"
