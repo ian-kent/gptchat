@@ -8,7 +8,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-func (m *Module) Recall(input string, gptModel string) (string, error) {
+func (m *Module) Recall(input string) (string, error) {
 	b, err := json.Marshal(m.memories)
 	if err != nil {
 		return "", err
@@ -17,7 +17,7 @@ func (m *Module) Recall(input string, gptModel string) (string, error) {
 	resp, err := m.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: gptModel,
+			Model: m.cfg.OpenAIAPIModel(),
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role: openai.ChatMessageRoleSystem,

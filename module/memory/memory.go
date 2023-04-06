@@ -39,7 +39,7 @@ func (m *Module) Execute(args, body string) (string, error) {
 	case "store":
 		return m.Store(body)
 	case "recall":
-		return m.Recall(body, m.cfg.OpenAIAPIModel())
+		return m.Recall(body)
 	default:
 		return "", errors.New(fmt.Sprintf("command not implemented: /memory %s", args))
 	}
