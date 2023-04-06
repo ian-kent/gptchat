@@ -3,6 +3,7 @@ package memory
 import (
 	"errors"
 	"fmt"
+
 	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/util"
 	openai "github.com/sashabaranov/go-openai"
@@ -38,7 +39,7 @@ func (m *Module) Execute(args, body string) (string, error) {
 	case "store":
 		return m.Store(body)
 	case "recall":
-		return m.Recall(body)
+		return m.Recall(body, m.cfg.OpenAIAPIModel())
 	default:
 		return "", errors.New(fmt.Sprintf("command not implemented: /memory %s", args))
 	}
