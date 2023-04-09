@@ -3,6 +3,7 @@ package memory
 import (
 	"errors"
 	"fmt"
+
 	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/util"
 	openai "github.com/sashabaranov/go-openai"

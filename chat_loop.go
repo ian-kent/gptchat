@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/module"
 	"github.com/ian-kent/gptchat/parser"
 	"github.com/ian-kent/gptchat/ui"
 	"github.com/ian-kent/gptchat/util"
 	"github.com/sashabaranov/go-openai"
-	"strings"
-	"time"
 )
 
 func chatLoop(cfg config.Config) {
@@ -113,7 +114,7 @@ RESET:
 		resp, err := client.CreateChatCompletion(
 			context.Background(),
 			openai.ChatCompletionRequest{
-				Model:    openai.GPT4,
+				Model:    cfg.OpenAIAPIModel(),
 				Messages: conversation,
 			},
 		)

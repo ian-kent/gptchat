@@ -3,6 +3,7 @@ package memory
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/ian-kent/gptchat/util"
 	"github.com/sashabaranov/go-openai"
 )
@@ -16,7 +17,7 @@ func (m *Module) Recall(input string) (string, error) {
 	resp, err := m.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT4,
+			Model: m.cfg.OpenAIAPIModel(),
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role: openai.ChatMessageRoleSystem,

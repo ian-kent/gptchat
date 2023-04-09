@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/ian-kent/gptchat/config"
 	"github.com/ian-kent/gptchat/module"
 	"github.com/ian-kent/gptchat/module/memory"
 	"github.com/ian-kent/gptchat/module/plugin"
 	"github.com/ian-kent/gptchat/ui"
 	openai "github.com/sashabaranov/go-openai"
-	"os"
-	"strconv"
-	"strings"
 )
 
 var client *openai.Client
@@ -21,7 +22,7 @@ func init() {
 	if openaiAPIKey == "" {
 		ui.Warn("You haven't configured an OpenAI API key")
 		fmt.Println()
-		if !ui.PromptConfirm("Do you have an API key with access to the GPT-4 model?") {
+		if !ui.PromptConfirm("Do you have an API key?") {
 			ui.Warn("You'll need an API key to use GPTChat")
 			fmt.Println()
 			fmt.Println("* You can get an API key at https://platform.openai.com/account/api-keys")
@@ -38,6 +39,16 @@ func init() {
 	}
 
 	cfg = cfg.WithOpenAIAPIKey(openaiAPIKey)
+
+	openaiAPIModel := strings.TrimSpace(os.Getenv("OPENAI_API_MODEL"))
+
+	if openaiAPIModel == "" {
+		ui.Warn("You haven't configured an OpenAI API model, defaulting to GPT4")
+
+		openaiAPIModel = openai.GPT4
+	}
+
+	cfg = cfg.WithOpenAIAPIModel(openaiAPIModel)
 
 	supervisorMode := os.Getenv("GPTCHAT_SUPERVISOR")
 	switch strings.ToLower(supervisorMode) {
@@ -71,8 +82,8 @@ func init() {
 
 func main() {
 	ui.Welcome(
-		`Welcome to the GPT-4 client.`,
-		`You can talk directly to GPT-4, or you can use /commands to interact with the client.
+		`Welcome to the GPT client.`,
+		`You can talk directly to GPT, or you can use /commands to interact with the client.
 
 Use /help to see a list of available commands.`)
 
