@@ -3,24 +3,8 @@ package ui
 import (
 	"bufio"
 	"fmt"
-	"github.com/fatih/color"
 	"os"
 	"strings"
-)
-
-var (
-	cUsername = color.New(color.FgRed)
-	cMessage  = color.New(color.FgBlue)
-	cUseful   = color.New(color.FgWhite)
-	cAI       = color.New(color.FgGreen)
-	cUser     = color.New(color.FgYellow)
-
-	cInfo  = color.New(color.FgWhite, color.Bold)
-	cError = color.New(color.FgHiRed, color.Bold)
-	cWarn  = color.New(color.FgHiYellow, color.Bold)
-
-	cApp     = color.New(color.FgWhite)
-	cAppBold = color.New(color.FgGreen, color.Bold)
 )
 
 const (
@@ -34,41 +18,41 @@ const (
 )
 
 func Error(message string, err error) {
-	cError.Printf("ERROR: ")
-	cUseful.Printf("%s: %v\n\n", message, err)
+	theme.Error.Printf("ERROR: ")
+	theme.Useful.Printf("%s: %v\n\n", message, err)
 }
 
 func Warn(message string) {
-	cWarn.Printf("WARNING: ")
-	cUseful.Printf("%s\n", message)
+	theme.Warn.Printf("WARNING: ")
+	theme.Useful.Printf("%s\n", message)
 }
 
 func Info(message string) {
-	cWarn.Printf("INFO: ")
-	cUseful.Printf("%s\n", message)
+	theme.Warn.Printf("INFO: ")
+	theme.Useful.Printf("%s\n", message)
 }
 
 func Welcome(title, message string) {
-	cAppBold.Printf("%s\n\n", title)
-	cApp.Printf("%s\n\n", message)
+	theme.AppBold.Printf("%s\n\n", title)
+	theme.App.Printf("%s\n\n", message)
 }
 
 func PrintChatDebug(name, message string) {
-	cUseful.Printf("[DEBUG] ")
+	theme.Useful.Printf("[DEBUG] ")
 	PrintChat(name, message)
 }
 
 func PrintChat(name, message string) {
 	switch name {
 	case User:
-		cUser.Printf("%s:\n\n", name)
-		cMessage.Printf("%s\n", indent(message))
+		theme.User.Printf("%s:\n\n", name)
+		theme.Message.Printf("%s\n", indent(message))
 	case AI:
-		cAI.Printf("%s:\n\n", name)
-		cUseful.Printf("%s\n", indent(message))
+		theme.AI.Printf("%s:\n\n", name)
+		theme.Useful.Printf("%s\n", indent(message))
 	case App:
-		cAppBold.Printf("%s:\n\n", name)
-		cUseful.Printf("%s\n", indent(message))
+		theme.AppBold.Printf("%s:\n\n", name)
+		theme.Useful.Printf("%s\n", indent(message))
 	case System:
 		fallthrough
 	case Tool:
@@ -78,14 +62,14 @@ func PrintChat(name, message string) {
 	case Module:
 		fallthrough
 	default:
-		cUsername.Printf("%s:\n\n", name)
-		cMessage.Printf("%s\n", indent(message))
+		theme.Username.Printf("%s:\n\n", name)
+		theme.Message.Printf("%s\n", indent(message))
 	}
 }
 
 func PromptChatInput() string {
 	reader := bufio.NewReader(os.Stdin)
-	cUser.Printf("USER:\n\n    ")
+	theme.User.Printf("USER:\n\n    ")
 	text, _ := reader.ReadString('\n')
 	text = strings.TrimSpace(text)
 	fmt.Println()
@@ -95,7 +79,7 @@ func PromptChatInput() string {
 
 func PromptConfirm(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
-	cAppBold.Printf("%s [Y/N]: ", prompt)
+	theme.AppBold.Printf("%s [Y/N]: ", prompt)
 	text, _ := reader.ReadString('\n')
 	text = strings.TrimSpace(text)
 	fmt.Println()
@@ -105,7 +89,7 @@ func PromptConfirm(prompt string) bool {
 
 func PromptInput(prompt string) string {
 	reader := bufio.NewReader(os.Stdin)
-	cAppBold.Printf("%s ", prompt)
+	theme.AppBold.Printf("%s ", prompt)
 	text, _ := reader.ReadString('\n')
 	text = strings.TrimSpace(text)
 	return text
